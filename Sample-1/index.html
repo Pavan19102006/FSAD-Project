@@ -1,0 +1,46 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Particle Animation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sample.css">
+</head>
+
+<body>
+
+    <canvas id="webglCanvas"></canvas>
+    <div class="content">
+        <section class="hero">
+            <h1>Welcome to the Future</h1>
+            <p>Experience the next generation of digital innovation</p>
+        </section>
+        <section class="section">
+            <h2>Our Vision</h2>
+            <p>Building tomorrow's technology today with cutting-edge solutions.</p>
+        </section>
+        <section class="section">
+            <h2>What We Do</h2>
+            <p>We create immersive digital experiences that captivate and inspire.</p>
+        </section>
+        <section class="section">
+            <h2>Join Us</h2>
+            <p>Be part of the revolution in digital transformation.</p>
+        </section>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/",
+            "animejs": "https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.es.js",
+            "simplex-noise": "https://cdn.skypack.dev/simplex-noise@4.0.1"
+        }
+    }
+    </script>
+    <script type="module" src="sample.js"></script>
+</body>
+
+</html>
