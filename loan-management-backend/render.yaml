@@ -4,8 +4,9 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile
     plan: free
+    healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
-        value: prod
+        value: render
       - key: JAVA_OPTS
         value: -Xmx256m

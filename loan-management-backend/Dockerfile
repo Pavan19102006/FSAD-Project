@@ -6,12 +6,12 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Render uses PORT environment variable
+# Render sets PORT environment variable
 ENV PORT=8080
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Xmx256m", "-jar", "app.jar", "--server.port=${PORT}"]
+ENTRYPOINT ["sh", "-c", "java -Xmx512m -jar app.jar --server.port=${PORT}"]
