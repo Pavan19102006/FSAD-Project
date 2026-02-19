@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Component
 @SuppressWarnings("null")
@@ -40,13 +39,13 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         // Create demo users
-        User admin = createUserIfNotExists("admin@12club.com", "admin123", "System", "Administrator",
+        createUserIfNotExists("admin@12club.com", "admin123", "System", "Administrator",
                 "+1234567890", Role.ADMIN, null, null, null);
         User lender = createUserIfNotExists("lender@12club.com", "lender123", "John", "Lender",
                 "+1234567891", Role.LENDER, new BigDecimal("250000"), "BUSINESS_OWNER", null);
         User borrower = createUserIfNotExists("borrower@12club.com", "borrower123", "Jane", "Borrower",
                 "+1234567892", Role.BORROWER, new BigDecimal("65000"), "EMPLOYED", 720);
-        User analyst = createUserIfNotExists("analyst@12club.com", "analyst123", "Alex", "Analyst",
+        createUserIfNotExists("analyst@12club.com", "analyst123", "Alex", "Analyst",
                 "+1234567893", Role.ANALYST, null, null, null);
 
         // Only seed demo data if no loans exist yet (avoid duplicating on restart)
