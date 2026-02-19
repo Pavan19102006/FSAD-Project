@@ -51,7 +51,12 @@ export const adminAPI = {
     // Credit score management
     getCreditScore: (userId) => api.get(`/admin/users/${userId}/credit-score`),
     updateCreditScore: (userId, data) => api.put(`/admin/users/${userId}/credit-score`, data),
-    calculateRisk: (userId) => api.post(`/admin/users/${userId}/calculate-risk`),
+    calculateRisk: (userId) => api.post(`/risk/calculate/${userId}`),
+};
+
+// Profile API (self-update)
+export const profileAPI = {
+    updateProfile: (data) => api.put('/auth/profile', data),
 };
 
 // Lender APIs

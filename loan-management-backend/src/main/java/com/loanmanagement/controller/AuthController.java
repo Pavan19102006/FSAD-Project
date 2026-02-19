@@ -42,4 +42,35 @@ public class AuthController {
         AuthResponse response = userService.refreshToken(refreshToken);
         return ResponseEntity.ok(ApiResponse.success("Token refreshed", response));
     }
+
+    @PutMapping("/profile")
+    @Operation(summary = "Update own profile")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> updateProfile(
+            @RequestBody java.util.Map<String, String> request) {
+        com.loanmanagement.entity.User user = userService.getCurrentUser();
+
+        if (request.get("firstName") != null) {
+            user.setFirstName(request.get("firstName"));
+        }
+        if (request.get("lastName") != null) {
+            user.setLastName(request.get("lastName"));
+        }
+        if (request.get("phoneNumber") != null) {
+            user.setPhoneNumber(request.get("phoneNumber"));
+        }
+        if (request.get("email") != null && !request.get("email").equals(user.getEmail())) {
+            user.setEmail(request.get("email"));
+        }
+
+        userService.saveUser(user);
+
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("id", user.getId());
+        result.put("email", user.getEmail());
+        result.put("firstName", user.getFirstName());
+        result.put("lastName", user.getLastName());
+        result.put("phoneNumber", user.getPhoneNumber());
+        result.put("role", user.getRole());
+        return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", result));
+    }
 }

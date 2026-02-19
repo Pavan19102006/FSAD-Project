@@ -1,12 +1,62 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { profileAPI } from '../services/api';
 
 const UserProfile = () => {
     const { user, logout } = useAuth();
     const [activeTab, setActiveTab] = useState('profile');
+    const [isEditing, setIsEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [saveMessage, setSaveMessage] = useState('');
+    const [editForm, setEditForm] = useState({
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
+        email: user?.email || '',
+        phoneNumber: user?.phoneNumber || '',
+    });
     const [showContactForm, setShowContactForm] = useState(false);
     const [contactMessage, setContactMessage] = useState('');
     const [submitted, setSubmitted] = useState(false);
+
+    const handleEditToggle = () => {
+        if (isEditing) {
+            // Cancel editing, reset form
+            setEditForm({
+                firstName: user?.firstName || '',
+                lastName: user?.lastName || '',
+                email: user?.email || '',
+                phoneNumber: user?.phoneNumber || '',
+            });
+        }
+        setIsEditing(!isEditing);
+        setSaveMessage('');
+    };
+
+    const handleInputChange = (e) => {
+        setEditForm({ ...editForm, [e.target.name]: e.target.value });
+    };
+
+    const handleSaveProfile = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        setSaveMessage('');
+        try {
+            const response = await profileAPI.updateProfile(editForm);
+            const updatedData = response.data.data;
+            // Update localStorage user data
+            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+            const newUser = { ...storedUser, ...updatedData };
+            localStorage.setItem('user', JSON.stringify(newUser));
+            setSaveMessage('✅ Profile updated successfully!');
+            setIsEditing(false);
+            // Reload to reflect changes
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (err) {
+            setSaveMessage('❌ Failed to update profile. ' + (err.response?.data?.message || ''));
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleContactSubmit = (e) => {
         e.preventDefault();
@@ -17,6 +67,9 @@ const UserProfile = () => {
             setSubmitted(false);
         }, 2000);
     };
+
+    // Generate a display user ID
+    const displayUserId = (user?.userId || user?.id) ? `USR-${String(user?.userId || user?.id).padStart(6, '0')}` : 'N/A';
 
     return (
         <div className="fade-in">
@@ -33,6 +86,7 @@ const UserProfile = () => {
                 <div className="profile-info">
                     <h2>{user?.firstName} {user?.lastName}</h2>
                     <span className="role-badge">{user?.role}</span>
+                    <span className="user-id-badge">{displayUserId}</span>
                 </div>
             </div>
 
@@ -61,40 +115,131 @@ const UserProfile = () => {
             {/* Profile Info Tab */}
             {activeTab === 'profile' && (
                 <div className="card">
-                    <div className="card-header">
+                    <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h3 className="card-title">Personal Information</h3>
-                    </div>
-                    <div className="profile-details">
-                        <div className="detail-row">
-                            <span className="detail-label">📧 Email</span>
-                            <span className="detail-value">{user?.email}</span>
-                        </div>
-                        <div className="detail-row">
-                            <span className="detail-label">👤 First Name</span>
-                            <span className="detail-value">{user?.firstName || 'Not set'}</span>
-                        </div>
-                        <div className="detail-row">
-                            <span className="detail-label">👤 Last Name</span>
-                            <span className="detail-value">{user?.lastName || 'Not set'}</span>
-                        </div>
-                        <div className="detail-row">
-                            <span className="detail-label">📱 Phone Number</span>
-                            <span className="detail-value">{user?.phoneNumber || 'Not set'}</span>
-                        </div>
-                        <div className="detail-row">
-                            <span className="detail-label">🎭 Role</span>
-                            <span className="detail-value">{user?.role}</span>
-                        </div>
-                        <div className="detail-row">
-                            <span className="detail-label">🆔 User ID</span>
-                            <span className="detail-value">#{user?.id}</span>
-                        </div>
-                    </div>
-                    <div style={{ marginTop: '24px' }}>
-                        <button className="btn btn-danger" onClick={logout}>
-                            🚪 Logout
+                        <button
+                            className={`btn ${isEditing ? 'btn-secondary' : 'btn-primary'}`}
+                            onClick={handleEditToggle}
+                            style={{ fontSize: '13px', padding: '8px 16px' }}
+                        >
+                            {isEditing ? '✖ Cancel' : '✏️ Edit Profile'}
                         </button>
                     </div>
+
+                    {saveMessage && (
+                        <div style={{
+                            padding: '12px 16px',
+                            marginBottom: '16px',
+                            borderRadius: '8px',
+                            background: saveMessage.startsWith('✅') ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+                            border: `1px solid ${saveMessage.startsWith('✅') ? '#10b981' : '#ef4444'}`,
+                            color: saveMessage.startsWith('✅') ? '#10b981' : '#ef4444',
+                            fontSize: '14px',
+                        }}>
+                            {saveMessage}
+                        </div>
+                    )}
+
+                    {isEditing ? (
+                        <form onSubmit={handleSaveProfile}>
+                            <div className="profile-details">
+                                <div className="detail-row edit-row">
+                                    <span className="detail-label">📧 Email</span>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={editForm.email}
+                                        onChange={handleInputChange}
+                                        className="profile-edit-input"
+                                        required
+                                    />
+                                </div>
+                                <div className="detail-row edit-row">
+                                    <span className="detail-label">👤 First Name</span>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        value={editForm.firstName}
+                                        onChange={handleInputChange}
+                                        className="profile-edit-input"
+                                        required
+                                    />
+                                </div>
+                                <div className="detail-row edit-row">
+                                    <span className="detail-label">👤 Last Name</span>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        value={editForm.lastName}
+                                        onChange={handleInputChange}
+                                        className="profile-edit-input"
+                                        required
+                                    />
+                                </div>
+                                <div className="detail-row edit-row">
+                                    <span className="detail-label">📱 Phone Number</span>
+                                    <input
+                                        type="tel"
+                                        name="phoneNumber"
+                                        value={editForm.phoneNumber}
+                                        onChange={handleInputChange}
+                                        className="profile-edit-input"
+                                        placeholder="Enter phone number"
+                                    />
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">🎭 Role</span>
+                                    <span className="detail-value" style={{ opacity: 0.6 }}>{user?.role} (cannot be changed)</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">🆔 User ID</span>
+                                    <span className="detail-value">{displayUserId}</span>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
+                                <button type="submit" className="btn btn-primary" disabled={saving}>
+                                    {saving ? '💾 Saving...' : '💾 Save Changes'}
+                                </button>
+                                <button type="button" className="btn btn-secondary" onClick={handleEditToggle}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    ) : (
+                        <>
+                            <div className="profile-details">
+                                <div className="detail-row">
+                                    <span className="detail-label">📧 Email</span>
+                                    <span className="detail-value">{user?.email}</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">👤 First Name</span>
+                                    <span className="detail-value">{user?.firstName || 'Not set'}</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">👤 Last Name</span>
+                                    <span className="detail-value">{user?.lastName || 'Not set'}</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">📱 Phone Number</span>
+                                    <span className="detail-value">{user?.phoneNumber || 'Not set'}</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">🎭 Role</span>
+                                    <span className="detail-value">{user?.role}</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">🆔 User ID</span>
+                                    <span className="detail-value">{displayUserId}</span>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '24px' }}>
+                                <button className="btn btn-danger" onClick={logout}>
+                                    🚪 Logout
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
             )}
 
@@ -242,6 +387,16 @@ const UserProfile = () => {
                     color: white;
                     text-transform: uppercase;
                 }
+                .user-id-badge {
+                    background: rgba(255,255,255,0.15);
+                    padding: 4px 12px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    color: rgba(255,255,255,0.8);
+                    margin-left: 8px;
+                    font-family: monospace;
+                    letter-spacing: 1px;
+                }
                 .profile-tabs {
                     display: flex;
                     gap: 12px;
@@ -272,18 +427,39 @@ const UserProfile = () => {
                 .detail-row {
                     display: flex;
                     justify-content: space-between;
+                    align-items: center;
                     padding: 16px;
                     background: rgba(255,255,255,0.03);
                     border-radius: 8px;
                     border: 1px solid rgba(255,255,255,0.05);
                 }
+                .edit-row {
+                    border: 1px solid rgba(102,126,234,0.3);
+                }
                 .detail-label {
                     color: #9ca3af;
                     font-weight: 500;
+                    min-width: 140px;
                 }
                 .detail-value {
                     color: white;
                     font-weight: 600;
+                }
+                .profile-edit-input {
+                    flex: 1;
+                    max-width: 300px;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 1px solid rgba(255,255,255,0.15);
+                    background: rgba(255,255,255,0.05);
+                    color: white;
+                    font-size: 14px;
+                    transition: border-color 0.2s;
+                }
+                .profile-edit-input:focus {
+                    outline: none;
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
                 }
                 .help-section {
                     display: grid;

@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import LandingPage from './pages/LandingPage';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminAnalytics from './pages/AdminAnalytics';
 import AdminUserManagement from './pages/AdminUserManagement';
 import LenderDashboard from './pages/LenderDashboard';
 import LenderLoans from './pages/LenderLoans';
@@ -14,6 +15,9 @@ import LenderWithdraw from './pages/LenderWithdraw';
 import LenderPayments from './pages/LenderPayments';
 import BorrowerDashboard from './pages/BorrowerDashboard';
 import AnalystDashboard from './pages/AnalystDashboard';
+import AnalystRisk from './pages/AnalystRisk';
+import AnalystPayments from './pages/AnalystPayments';
+import AnalystLoans from './pages/AnalystLoans';
 import UserProfile from './pages/UserProfile';
 
 function App() {
@@ -31,7 +35,7 @@ function App() {
                         <Route index element={<AdminDashboard />} />
                         <Route path="dashboard" element={<AdminDashboard />} />
                         <Route path="users" element={<AdminUserManagement />} />
-                        <Route path="analytics" element={<AdminDashboard />} />
+                        <Route path="analytics" element={<AdminAnalytics />} />
                         <Route path="profile" element={<UserProfile />} />
                     </Route>
 
@@ -64,9 +68,9 @@ function App() {
                     <Route path="/analyst" element={<Layout />}>
                         <Route index element={<AnalystDashboard />} />
                         <Route path="dashboard" element={<AnalystDashboard />} />
-                        <Route path="risk" element={<AnalystDashboard />} />
-                        <Route path="payments" element={<AnalystDashboard />} />
-                        <Route path="loans" element={<AnalystDashboard />} />
+                        <Route path="risk" element={<AnalystRisk />} />
+                        <Route path="payments" element={<AnalystPayments />} />
+                        <Route path="loans" element={<AnalystLoans />} />
                         <Route path="profile" element={<UserProfile />} />
                     </Route>
 
