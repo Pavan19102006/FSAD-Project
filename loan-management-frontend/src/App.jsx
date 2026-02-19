@@ -14,6 +14,7 @@ import LenderWithdraw from './pages/LenderWithdraw';
 import LenderPayments from './pages/LenderPayments';
 import BorrowerDashboard from './pages/BorrowerDashboard';
 import AnalystDashboard from './pages/AnalystDashboard';
+import UserProfile from './pages/UserProfile';
 
 function App() {
     return (
@@ -31,6 +32,7 @@ function App() {
                         <Route path="dashboard" element={<AdminDashboard />} />
                         <Route path="users" element={<AdminUserManagement />} />
                         <Route path="analytics" element={<AdminDashboard />} />
+                        <Route path="profile" element={<UserProfile />} />
                     </Route>
 
                     {/* Lender Routes */}
@@ -43,6 +45,7 @@ function App() {
                         <Route path="payments" element={<LenderPayments />} />
                         <Route path="create" element={<LenderCreateLoan />} />
                         <Route path="withdraw" element={<LenderWithdraw />} />
+                        <Route path="profile" element={<UserProfile />} />
                     </Route>
 
                     {/* Borrower Routes */}
@@ -54,6 +57,7 @@ function App() {
                         <Route path="payments" element={<BorrowerDashboard />} />
                         <Route path="offers" element={<BorrowerDashboard />} />
                         <Route path="credit-score" element={<BorrowerDashboard />} />
+                        <Route path="profile" element={<UserProfile />} />
                     </Route>
 
                     {/* Analyst Routes */}
@@ -63,6 +67,7 @@ function App() {
                         <Route path="risk" element={<AnalystDashboard />} />
                         <Route path="payments" element={<AnalystDashboard />} />
                         <Route path="loans" element={<AnalystDashboard />} />
+                        <Route path="profile" element={<UserProfile />} />
                     </Route>
 
                     {/* Catch all */}

@@ -98,11 +98,36 @@ const Login = () => {
                 </div>
 
                 <div style={{ marginTop: '24px', padding: '16px', background: 'var(--bg-glass)', borderRadius: 'var(--radius-md)', fontSize: '13px' }}>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>Demo Accounts:</p>
-                    <p>Admin: admin@12club.com / admin123</p>
-                    <p>Lender: lender@12club.com / lender123</p>
-                    <p>Borrower: borrower@12club.com / borrower123</p>
-                    <p>Analyst: analyst@12club.com / analyst123</p>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '12px', textAlign: 'center', fontWeight: '600' }}>Quick Demo Login</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                        {[
+                            { role: '🛡️ Admin', email: 'admin@12club.com', password: 'admin123', color: '#ef4444' },
+                            { role: '💰 Lender', email: 'lender@12club.com', password: 'lender123', color: '#3b82f6' },
+                            { role: '🏦 Borrower', email: 'borrower@12club.com', password: 'borrower123', color: '#10b981' },
+                            { role: '📊 Analyst', email: 'analyst@12club.com', password: 'analyst123', color: '#f59e0b' },
+                        ].map((demo) => (
+                            <button
+                                key={demo.role}
+                                type="button"
+                                onClick={() => { setEmail(demo.email); setPassword(demo.password); }}
+                                style={{
+                                    padding: '10px 12px',
+                                    background: `${demo.color}15`,
+                                    border: `1px solid ${demo.color}40`,
+                                    borderRadius: '8px',
+                                    color: demo.color,
+                                    cursor: 'pointer',
+                                    fontSize: '13px',
+                                    fontWeight: '600',
+                                    transition: 'all 0.2s',
+                                }}
+                                onMouseEnter={(e) => { e.target.style.background = `${demo.color}30`; e.target.style.transform = 'scale(1.02)'; }}
+                                onMouseLeave={(e) => { e.target.style.background = `${demo.color}15`; e.target.style.transform = 'scale(1)'; }}
+                            >
+                                {demo.role}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

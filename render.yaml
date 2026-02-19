@@ -32,7 +32,7 @@ services:
     routes:
       - type: rewrite
         source: /api/*
-        destination: https://loan-management-backend.onrender.com/api/*
+        destination: https://fsad-project-z4yo.onrender.com/api/*
       - type: rewrite
         source: /*
         destination: /index.html
