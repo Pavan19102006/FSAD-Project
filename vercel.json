@@ -1,0 +1,15 @@
+{
+    "installCommand": "cd loan-management-frontend && npm install",
+    "buildCommand": "cd loan-management-frontend && npm run build",
+    "outputDirectory": "loan-management-frontend/dist",
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "https://fsad-project-z4yo.onrender.com/api/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}
