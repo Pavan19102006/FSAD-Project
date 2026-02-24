@@ -128,6 +128,13 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("Credit score updated", result));
     }
 
+    @GetMapping("/trends")
+    @Operation(summary = "Get monthly trend data for charts")
+    public ResponseEntity<ApiResponse<java.util.List<java.util.Map<String, Object>>>> getMonthlyTrends() {
+        java.util.List<java.util.Map<String, Object>> trends = reportService.getMonthlyTrends();
+        return ResponseEntity.ok(ApiResponse.success(trends));
+    }
+
     @GetMapping("/users/stats")
     @Operation(summary = "Get user statistics")
     public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> getUserStats() {

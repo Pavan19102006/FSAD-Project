@@ -1001,3 +1001,239 @@ tr:hover td {
   background: rgba(251, 146, 60, 0.2);
   color: #fb923c;
 }
+
+/* =============== CHART STYLES =============== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Staggered chart card entrance */
+@keyframes chartSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes chartGlow {
+
+  0%,
+  100% {
+    box-shadow: var(--shadow-md);
+  }
+
+  50% {
+    box-shadow: var(--shadow-md), 0 0 20px rgba(99, 102, 241, 0.08);
+  }
+}
+
+.chart-card {
+  background: var(--bg-card);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+  animation: chartSlideUp 0.6s ease forwards, chartGlow 4s ease-in-out 1.5s infinite;
+  opacity: 0;
+}
+
+.chart-card:nth-child(1) {
+  animation-delay: 0.1s, 2s;
+}
+
+.chart-card:nth-child(2) {
+  animation-delay: 0.25s, 2.2s;
+}
+
+.chart-card:nth-child(3) {
+  animation-delay: 0.4s, 2.4s;
+}
+
+.chart-card:nth-child(4) {
+  animation-delay: 0.55s, 2.6s;
+}
+
+.chart-card:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 102, 241, 0.12);
+  transform: translateY(-3px);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.chart-wrapper {
+  width: 100%;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Stat card entrance animations ===== */
+@keyframes statPop {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  70% {
+    transform: translateY(-3px) scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.stats-grid .stat-card {
+  animation: statPop 0.5s ease forwards;
+  opacity: 0;
+}
+
+.stats-grid .stat-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.stats-grid .stat-card:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.stats-grid .stat-card:nth-child(3) {
+  animation-delay: 0.19s;
+}
+
+.stats-grid .stat-card:nth-child(4) {
+  animation-delay: 0.26s;
+}
+
+/* Shimmer accent on stat values */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.stat-value {
+  background-size: 200% auto;
+  animation: shimmer 3s linear 1s 1;
+}
+
+/* Live pulse dot for active items */
+@keyframes livePulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3);
+  }
+}
+
+.stat-change.positive::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--secondary);
+  margin-right: 6px;
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+.stat-change.negative::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--danger);
+  margin-right: 6px;
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+
+/* Recharts custom tooltip */
+.custom-tooltip {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 12px 16px !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.custom-tooltip .recharts-tooltip-label {
+  color: var(--text-primary) !important;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.custom-tooltip .recharts-tooltip-item {
+  color: var(--text-secondary) !important;
+  font-size: 13px;
+}
+
+/* Legend center text for donut */
+.chart-center-label {
+  text-anchor: middle;
+  fill: var(--text-primary);
+  font-weight: 700;
+  font-size: 28px;
+}
+
+.chart-center-sublabel {
+  text-anchor: middle;
+  fill: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Full-width charts */
+.chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}

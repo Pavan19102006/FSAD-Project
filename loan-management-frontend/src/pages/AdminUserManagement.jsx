@@ -310,11 +310,11 @@ const AdminUserManagement = () => {
                 .table th, .table td {
                     padding: 12px;
                     text-align: left;
-                    border-bottom: 1px solid rgba(255,255,255,0.1);
+                    border-bottom: 1px solid var(--border-color);
                 }
                 .table th {
                     font-weight: 600;
-                    color: #9ca3af;
+                    color: #4b5563;
                     font-size: 12px;
                     text-transform: uppercase;
                 }
@@ -340,36 +340,42 @@ const AdminUserManagement = () => {
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background: rgba(0,0,0,0.7);
+                    background: rgba(0,0,0,0.5);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     z-index: 1000;
                 }
                 .modal {
-                    background: #1f2937;
+                    background: var(--bg-secondary);
                     border-radius: 12px;
                     width: 90%;
                     max-height: 90vh;
                     overflow-y: auto;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+                    border: 1px solid var(--border-color);
                 }
                 .modal-header {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
                     padding: 20px;
-                    border-bottom: 1px solid rgba(255,255,255,0.1);
+                    border-bottom: 1px solid var(--border-color);
                 }
                 .modal-header h2 {
                     margin: 0;
                     font-size: 18px;
+                    color: #1d1d1f;
                 }
                 .modal-close {
                     background: none;
                     border: none;
-                    color: white;
+                    color: #6b7280;
                     font-size: 24px;
                     cursor: pointer;
+                }
+                .modal-close:hover {
+                    color: #1d1d1f;
                 }
                 .modal-body {
                     padding: 20px;
@@ -381,14 +387,15 @@ const AdminUserManagement = () => {
                     display: block;
                     margin-bottom: 6px;
                     font-weight: 500;
+                    color: #4b5563;
                 }
                 .form-control {
                     width: 100%;
                     padding: 10px;
                     border-radius: 8px;
-                    border: 1px solid rgba(255,255,255,0.2);
-                    background: rgba(255,255,255,0.05);
-                    color: white;
+                    border: 1px solid var(--border-color);
+                    background: var(--bg-tertiary);
+                    color: #1d1d1f;
                     font-size: 14px;
                 }
             `}</style>

@@ -407,18 +407,21 @@ const UserProfile = () => {
                     padding: 12px 24px;
                     border: none;
                     border-radius: 8px;
-                    background: rgba(255,255,255,0.05);
-                    color: #9ca3af;
+                    background: var(--bg-tertiary);
+                    color: #4b5563;
                     cursor: pointer;
                     transition: all 0.3s;
                     font-size: 14px;
+                    border: 1px solid var(--border-color);
                 }
                 .tab-btn:hover {
-                    background: rgba(255,255,255,0.1);
+                    background: var(--bg-glass);
+                    border-color: var(--primary);
                 }
                 .tab-btn.active {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     color: white;
+                    border-color: transparent;
                 }
                 .profile-details {
                     display: grid;
@@ -429,20 +432,20 @@ const UserProfile = () => {
                     justify-content: space-between;
                     align-items: center;
                     padding: 16px;
-                    background: rgba(255,255,255,0.03);
+                    background: var(--bg-tertiary);
                     border-radius: 8px;
-                    border: 1px solid rgba(255,255,255,0.05);
+                    border: 1px solid var(--border-color);
                 }
                 .edit-row {
                     border: 1px solid rgba(102,126,234,0.3);
                 }
                 .detail-label {
-                    color: #9ca3af;
+                    color: #6b7280;
                     font-weight: 500;
                     min-width: 140px;
                 }
                 .detail-value {
-                    color: white;
+                    color: #1d1d1f;
                     font-weight: 600;
                 }
                 .profile-edit-input {
@@ -450,9 +453,9 @@ const UserProfile = () => {
                     max-width: 300px;
                     padding: 10px 14px;
                     border-radius: 8px;
-                    border: 1px solid rgba(255,255,255,0.15);
-                    background: rgba(255,255,255,0.05);
-                    color: white;
+                    border: 1px solid var(--border-color);
+                    background: var(--bg-secondary);
+                    color: #1d1d1f;
                     font-size: 14px;
                     transition: border-color 0.2s;
                 }
@@ -467,17 +470,17 @@ const UserProfile = () => {
                 }
                 .faq-item {
                     padding: 20px;
-                    background: rgba(255,255,255,0.03);
+                    background: var(--bg-tertiary);
                     border-radius: 8px;
                     border-left: 3px solid #667eea;
                 }
                 .faq-item h4 {
                     margin: 0 0 8px 0;
-                    color: white;
+                    color: #1d1d1f;
                 }
                 .faq-item p {
                     margin: 0;
-                    color: #9ca3af;
+                    color: #6b7280;
                 }
                 .contact-section {
                     display: grid;
@@ -493,7 +496,7 @@ const UserProfile = () => {
                     align-items: flex-start;
                     gap: 16px;
                     padding: 20px;
-                    background: rgba(255,255,255,0.03);
+                    background: var(--bg-tertiary);
                     border-radius: 8px;
                 }
                 .contact-icon {
@@ -501,20 +504,20 @@ const UserProfile = () => {
                 }
                 .contact-item strong {
                     display: block;
-                    color: white;
+                    color: #1d1d1f;
                     margin-bottom: 4px;
                 }
                 .contact-item p {
                     margin: 0;
-                    color: #9ca3af;
+                    color: #6b7280;
                 }
                 .contact-form-section {
                     padding-top: 24px;
-                    border-top: 1px solid rgba(255,255,255,0.1);
+                    border-top: 1px solid var(--border-color);
                 }
                 .contact-form-section h4 {
                     margin: 0 0 16px 0;
-                    color: white;
+                    color: #1d1d1f;
                 }
                 .success-message {
                     padding: 20px;
@@ -530,16 +533,16 @@ const UserProfile = () => {
                 .form-group label {
                     display: block;
                     margin-bottom: 6px;
-                    color: #9ca3af;
+                    color: #4b5563;
                     font-weight: 500;
                 }
                 .form-control {
                     width: 100%;
                     padding: 12px;
                     border-radius: 8px;
-                    border: 1px solid rgba(255,255,255,0.1);
-                    background: rgba(255,255,255,0.05);
-                    color: white;
+                    border: 1px solid var(--border-color);
+                    background: var(--bg-secondary);
+                    color: #1d1d1f;
                     font-size: 14px;
                 }
                 .form-control:focus {

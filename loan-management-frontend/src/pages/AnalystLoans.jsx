@@ -42,7 +42,7 @@ const AnalystLoans = () => {
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'USD',
+            currency: 'INR',
         }).format(amount || 0);
     };
 
@@ -110,8 +110,8 @@ const AnalystLoans = () => {
                             padding: '8px 16px',
                             borderRadius: '8px',
                             border: 'none',
-                            background: filter === status ? (status === 'ALL' ? '#667eea' : getStatusColor(status)) : 'rgba(255,255,255,0.05)',
-                            color: filter === status ? 'white' : '#9ca3af',
+                            background: filter === status ? (status === 'ALL' ? '#667eea' : getStatusColor(status)) : 'var(--bg-tertiary)',
+                            color: filter === status ? 'white' : '#4b5563',
                             cursor: 'pointer',
                             fontSize: '13px',
                             fontWeight: '600',
@@ -129,7 +129,7 @@ const AnalystLoans = () => {
                     <h3 className="card-title">Loans ({filteredLoans.length})</h3>
                 </div>
                 {filteredLoans.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '32px', color: '#9ca3af' }}>
+                    <div style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
                         No loans found for this filter.
                     </div>
                 ) : (
@@ -182,25 +182,25 @@ const AnalystLoans = () => {
                                                 <td colSpan="7" style={{ background: 'rgba(102,126,234,0.05)', padding: '20px' }}>
                                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: loanPayments.length > 0 ? '16px' : '0' }}>
                                                         <div>
-                                                            <span style={{ color: '#9ca3af', fontSize: '12px' }}>Lender</span>
-                                                            <div style={{ color: 'white', fontWeight: '600' }}>{loan.lenderName || 'N/A'}</div>
+                                                            <span style={{ color: '#6b7280', fontSize: '12px' }}>Lender</span>
+                                                            <div style={{ color: '#1d1d1f', fontWeight: '600' }}>{loan.lenderName || 'N/A'}</div>
                                                         </div>
                                                         <div>
-                                                            <span style={{ color: '#9ca3af', fontSize: '12px' }}>Borrower</span>
-                                                            <div style={{ color: 'white', fontWeight: '600' }}>{loan.borrowerName || 'N/A'}</div>
+                                                            <span style={{ color: '#6b7280', fontSize: '12px' }}>Borrower</span>
+                                                            <div style={{ color: '#1d1d1f', fontWeight: '600' }}>{loan.borrowerName || 'N/A'}</div>
                                                         </div>
                                                         <div>
-                                                            <span style={{ color: '#9ca3af', fontSize: '12px' }}>Created</span>
-                                                            <div style={{ color: 'white', fontWeight: '600' }}>{loan.createdAt ? new Date(loan.createdAt).toLocaleDateString() : 'N/A'}</div>
+                                                            <span style={{ color: '#6b7280', fontSize: '12px' }}>Created</span>
+                                                            <div style={{ color: '#1d1d1f', fontWeight: '600' }}>{loan.createdAt ? new Date(loan.createdAt).toLocaleDateString() : 'N/A'}</div>
                                                         </div>
                                                         <div>
-                                                            <span style={{ color: '#9ca3af', fontSize: '12px' }}>Monthly EMI</span>
-                                                            <div style={{ color: 'white', fontWeight: '600' }}>{formatCurrency(loan.emiAmount)}</div>
+                                                            <span style={{ color: '#6b7280', fontSize: '12px' }}>Monthly EMI</span>
+                                                            <div style={{ color: '#1d1d1f', fontWeight: '600' }}>{formatCurrency(loan.emiAmount)}</div>
                                                         </div>
                                                     </div>
                                                     {loanPayments.length > 0 && (
                                                         <div>
-                                                            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '8px', fontWeight: '600' }}>Payment History ({loanPayments.length})</div>
+                                                            <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px', fontWeight: '600' }}>Payment History ({loanPayments.length})</div>
                                                             <table className="data-table" style={{ fontSize: '12px' }}>
                                                                 <thead>
                                                                     <tr>

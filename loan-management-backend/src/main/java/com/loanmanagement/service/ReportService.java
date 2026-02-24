@@ -6,10 +6,11 @@ import com.loanmanagement.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class ReportService {
@@ -176,16 +177,53 @@ public class ReportService {
     public Map<String, Object> getPaymentAnalytics() {
         Map<String, Object> analytics = new HashMap<>();
 
+        // Status distribution
         Map<String, Long> statusDistribution = new HashMap<>();
         for (PaymentStatus status : PaymentStatus.values()) {
             statusDistribution.put(status.name(), (long) paymentRepository.findByStatus(status).size());
         }
         analytics.put("statusDistribution", statusDistribution);
 
+        // Total counts the frontend needs
+        List<Payment> allPayments = paymentRepository.findAll();
+        long totalPayments = allPayments.size();
         long completedPayments = paymentRepository.findByStatus(PaymentStatus.COMPLETED).size();
         long latePayments = paymentRepository.findByStatus(PaymentStatus.LATE).size();
+        long pendingPayments = paymentRepository.findByStatus(PaymentStatus.PENDING).size();
+        long missedPayments = paymentRepository.findByStatus(PaymentStatus.MISSED).size();
         long totalProcessed = completedPayments + latePayments;
 
+        analytics.put("totalPayments", totalPayments);
+        analytics.put("completedPayments", completedPayments);
+        analytics.put("pendingPayments", pendingPayments);
+        analytics.put("latePayments", latePayments);
+        analytics.put("missedPayments", missedPayments);
+
+        // Financial totals
+        BigDecimal totalAmountCollected = allPayments.stream()
+                .filter(p -> p.getAmountPaid() != null
+                        && (p.getStatus() == PaymentStatus.COMPLETED || p.getStatus() == PaymentStatus.LATE))
+                .map(Payment::getAmountPaid)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        analytics.put("totalAmountCollected", totalAmountCollected);
+
+        BigDecimal totalAmountPending = allPayments.stream()
+                .filter(p -> p.getStatus() == PaymentStatus.PENDING || p.getStatus() == PaymentStatus.OVERDUE)
+                .map(Payment::getAmountDue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        analytics.put("totalAmountPending", totalAmountPending);
+
+        if (totalPayments > 0) {
+            BigDecimal totalAmountDue = allPayments.stream()
+                    .map(Payment::getAmountDue)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            analytics.put("averagePaymentAmount",
+                    totalAmountDue.divide(BigDecimal.valueOf(totalPayments), 2, java.math.RoundingMode.HALF_UP));
+        } else {
+            analytics.put("averagePaymentAmount", BigDecimal.ZERO);
+        }
+
+        // On-time rate
         if (totalProcessed > 0) {
             double onTimeRate = (double) completedPayments / totalProcessed * 100;
             analytics.put("onTimePaymentRate", Math.round(onTimeRate * 100.0) / 100.0);
@@ -193,6 +231,7 @@ public class ReportService {
             analytics.put("onTimePaymentRate", 100.0);
         }
 
+        // Monthly transaction summary
         Map<String, BigDecimal> transactionSummary = new HashMap<>();
         LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
         LocalDateTime now = LocalDateTime.now();
@@ -223,5 +262,89 @@ public class ReportService {
         return paymentRepository.findOverduePayments(java.time.LocalDate.now()).stream()
                 .map(Payment::getAmountDue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    /**
+     * Returns monthly aggregated data over the last 12 months for trend charts.
+     */
+    public List<Map<String, Object>> getMonthlyTrends() {
+        List<Map<String, Object>> trends = new ArrayList<>();
+        DateTimeFormatter monthFormat = DateTimeFormatter.ofPattern("MMM yy");
+
+        List<Loan> allLoans = loanRepository.findAll();
+        List<Payment> allPayments = paymentRepository.findAll();
+
+        for (int i = 11; i >= 0; i--) {
+            YearMonth ym = YearMonth.now().minusMonths(i);
+            LocalDate monthStart = ym.atDay(1);
+            LocalDate monthEnd = ym.atEndOfMonth();
+
+            Map<String, Object> monthData = new LinkedHashMap<>();
+            monthData.put("month", ym.format(monthFormat));
+
+            // New loans created this month (by startDate)
+            long newLoans = allLoans.stream()
+                    .filter(l -> l.getStartDate() != null &&
+                            !l.getStartDate().isBefore(monthStart) &&
+                            !l.getStartDate().isAfter(monthEnd))
+                    .count();
+            monthData.put("newLoans", newLoans);
+
+            // Loan volume (principal) this month
+            BigDecimal loanVolume = allLoans.stream()
+                    .filter(l -> l.getStartDate() != null &&
+                            !l.getStartDate().isBefore(monthStart) &&
+                            !l.getStartDate().isAfter(monthEnd))
+                    .map(Loan::getPrincipalAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            monthData.put("loanVolume", loanVolume);
+
+            // Payments collected this month (completed/late payments with paidDate)
+            BigDecimal collected = allPayments.stream()
+                    .filter(p -> p.getPaidDate() != null &&
+                            !p.getPaidDate().isBefore(monthStart) &&
+                            !p.getPaidDate().isAfter(monthEnd) &&
+                            (p.getStatus() == PaymentStatus.COMPLETED || p.getStatus() == PaymentStatus.LATE))
+                    .map(Payment::getAmountPaid)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            monthData.put("paymentsCollected", collected);
+
+            // Interest earned this month
+            BigDecimal interest = allPayments.stream()
+                    .filter(p -> p.getPaidDate() != null &&
+                            !p.getPaidDate().isBefore(monthStart) &&
+                            !p.getPaidDate().isAfter(monthEnd) &&
+                            (p.getStatus() == PaymentStatus.COMPLETED || p.getStatus() == PaymentStatus.LATE))
+                    .map(Payment::getInterestPortion)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            monthData.put("interestEarned", interest);
+
+            // Active loans count at end of month
+            long activeCount = allLoans.stream()
+                    .filter(l -> l.getStartDate() != null && l.getEndDate() != null &&
+                            !l.getStartDate().isAfter(monthEnd) &&
+                            !l.getEndDate().isBefore(monthStart) &&
+                            (l.getStatus() == LoanStatus.ACTIVE || l.getStatus() == LoanStatus.COMPLETED ||
+                                    l.getStatus() == LoanStatus.DEFAULTED))
+                    .count();
+            monthData.put("activeLoans", activeCount);
+
+            // Cumulative portfolio value (sum of remaining balance of loans active at this
+            // point)
+            BigDecimal portfolioValue = allLoans.stream()
+                    .filter(l -> l.getStartDate() != null &&
+                            !l.getStartDate().isAfter(monthEnd) &&
+                            (l.getStatus() == LoanStatus.ACTIVE ||
+                                    (l.getEndDate() != null && !l.getEndDate().isBefore(monthStart))))
+                    .map(Loan::getPrincipalAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            monthData.put("portfolioValue", portfolioValue);
+
+            trends.add(monthData);
+        }
+
+        return trends;
     }
 }

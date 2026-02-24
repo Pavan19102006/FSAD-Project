@@ -88,7 +88,7 @@ const BorrowerDashboard = () => {
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'USD',
+            currency: 'INR',
         }).format(amount || 0);
     };
 
@@ -441,7 +441,7 @@ const BorrowerDashboard = () => {
                                         </td>
                                         <td>
                                             {(payment.status === 'PENDING' || payment.status === 'OVERDUE' || payment.status === 'REJECTED') && (
-                                                <button 
+                                                <button
                                                     className="btn btn-primary btn-sm"
                                                     onClick={() => handleMarkAsPaid(payment.id)}
                                                     disabled={loading}
@@ -524,8 +524,8 @@ const BorrowerDashboard = () => {
                                     <p><strong>Term:</strong> {offer.termMonths} months</p>
                                     {offer.description && <p><strong>Description:</strong> {offer.description}</p>}
                                 </div>
-                                <button 
-                                    className="btn btn-primary" 
+                                <button
+                                    className="btn btn-primary"
                                     style={{ width: '100%' }}
                                     onClick={() => handleApplyForLoan(offer)}
                                     disabled={loading}
@@ -553,10 +553,10 @@ const BorrowerDashboard = () => {
 
                 {/* Credit Score Display */}
                 <div className="card" style={{ marginBottom: '24px' }}>
-                    <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        alignItems: 'center', 
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
                         padding: '30px',
                         background: getCreditScoreGradient(creditScore?.creditScore),
                         borderRadius: '12px',
@@ -564,23 +564,23 @@ const BorrowerDashboard = () => {
                         marginBottom: '24px'
                     }}>
                         <div style={{ fontSize: '14px', marginBottom: '8px', opacity: 0.9 }}>YOUR CREDIT SCORE</div>
-                        <div style={{ 
-                            fontSize: '72px', 
-                            fontWeight: 'bold', 
+                        <div style={{
+                            fontSize: '72px',
+                            fontWeight: 'bold',
                             lineHeight: 1,
                             textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
                         }}>
                             {creditScore?.creditScore || '---'}
                         </div>
-                        <div style={{ 
-                            fontSize: '24px', 
+                        <div style={{
+                            fontSize: '24px',
                             marginTop: '8px',
                             fontWeight: '600'
                         }}>
                             {creditScore?.creditRating || 'Not Available'}
                         </div>
-                        <div style={{ 
-                            fontSize: '14px', 
+                        <div style={{
+                            fontSize: '14px',
                             marginTop: '12px',
                             opacity: 0.85,
                             display: 'flex',
@@ -598,9 +598,9 @@ const BorrowerDashboard = () => {
                         <div className="stats-grid" style={{ marginBottom: '24px' }}>
                             <div className="stat-card">
                                 <div className="stat-label">Risk Level</div>
-                                <div className="stat-value" style={{ 
-                                    color: creditScore?.riskLevel === 'LOW' ? '#10b981' : 
-                                           creditScore?.riskLevel === 'MEDIUM' ? '#eab308' : '#ef4444'
+                                <div className="stat-value" style={{
+                                    color: creditScore?.riskLevel === 'LOW' ? '#10b981' :
+                                        creditScore?.riskLevel === 'MEDIUM' ? '#eab308' : '#ef4444'
                                 }}>
                                     {creditScore?.riskLevel || 'N/A'}
                                 </div>
@@ -624,9 +624,9 @@ const BorrowerDashboard = () => {
 
                     {/* Recommendations */}
                     {creditScore?.recommendations && (
-                        <div style={{ 
-                            background: 'var(--bg-secondary)', 
-                            padding: '16px', 
+                        <div style={{
+                            background: 'var(--bg-secondary)',
+                            padding: '16px',
                             borderRadius: '8px',
                             marginBottom: '24px'
                         }}>
@@ -641,13 +641,13 @@ const BorrowerDashboard = () => {
 
                     {/* Action Buttons */}
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                        <button 
+                        <button
                             className="btn btn-primary"
                             onClick={() => { setShowManualEntry(true); setShowCalculator(false); }}
                         >
                             ✏️ Enter Score Manually
                         </button>
-                        <button 
+                        <button
                             className="btn btn-secondary"
                             onClick={() => { setShowCalculator(true); setShowManualEntry(false); }}
                         >
@@ -661,8 +661,8 @@ const BorrowerDashboard = () => {
                     <div className="card" style={{ marginBottom: '24px' }}>
                         <div className="card-header">
                             <h3 className="card-title">Enter Credit Score Manually</h3>
-                            <button 
-                                className="btn btn-secondary" 
+                            <button
+                                className="btn btn-secondary"
                                 style={{ padding: '4px 12px' }}
                                 onClick={() => setShowManualEntry(false)}
                             >
@@ -689,7 +689,7 @@ const BorrowerDashboard = () => {
                                     type="number"
                                     className="form-input"
                                     value={calculatorForm.annualIncome}
-                                    onChange={(e) => setCalculatorForm({...calculatorForm, annualIncome: e.target.value})}
+                                    onChange={(e) => setCalculatorForm({ ...calculatorForm, annualIncome: e.target.value })}
                                     placeholder="Enter your annual income"
                                 />
                             </div>
@@ -698,7 +698,7 @@ const BorrowerDashboard = () => {
                                 <select
                                     className="form-input"
                                     value={calculatorForm.employmentStatus}
-                                    onChange={(e) => setCalculatorForm({...calculatorForm, employmentStatus: e.target.value})}
+                                    onChange={(e) => setCalculatorForm({ ...calculatorForm, employmentStatus: e.target.value })}
                                 >
                                     <option value="EMPLOYED">Employed (Full-time)</option>
                                     <option value="PART_TIME">Part-time</option>
@@ -720,8 +720,8 @@ const BorrowerDashboard = () => {
                     <div className="card" style={{ marginBottom: '24px' }}>
                         <div className="card-header">
                             <h3 className="card-title">Calculate Your Credit Score</h3>
-                            <button 
-                                className="btn btn-secondary" 
+                            <button
+                                className="btn btn-secondary"
                                 style={{ padding: '4px 12px' }}
                                 onClick={() => setShowCalculator(false)}
                             >
@@ -739,7 +739,7 @@ const BorrowerDashboard = () => {
                                         type="number"
                                         className="form-input"
                                         value={calculatorForm.annualIncome}
-                                        onChange={(e) => setCalculatorForm({...calculatorForm, annualIncome: e.target.value})}
+                                        onChange={(e) => setCalculatorForm({ ...calculatorForm, annualIncome: e.target.value })}
                                         placeholder="e.g., 50000"
                                         required
                                     />
@@ -749,7 +749,7 @@ const BorrowerDashboard = () => {
                                     <select
                                         className="form-input"
                                         value={calculatorForm.employmentStatus}
-                                        onChange={(e) => setCalculatorForm({...calculatorForm, employmentStatus: e.target.value})}
+                                        onChange={(e) => setCalculatorForm({ ...calculatorForm, employmentStatus: e.target.value })}
                                     >
                                         <option value="EMPLOYED">Employed (Full-time)</option>
                                         <option value="PART_TIME">Part-time</option>
@@ -765,7 +765,7 @@ const BorrowerDashboard = () => {
                                         type="number"
                                         className="form-input"
                                         value={calculatorForm.totalDebt}
-                                        onChange={(e) => setCalculatorForm({...calculatorForm, totalDebt: e.target.value})}
+                                        onChange={(e) => setCalculatorForm({ ...calculatorForm, totalDebt: e.target.value })}
                                         placeholder="e.g., 10000"
                                     />
                                 </div>
@@ -775,7 +775,7 @@ const BorrowerDashboard = () => {
                                         type="number"
                                         className="form-input"
                                         value={calculatorForm.existingLoans}
-                                        onChange={(e) => setCalculatorForm({...calculatorForm, existingLoans: e.target.value})}
+                                        onChange={(e) => setCalculatorForm({ ...calculatorForm, existingLoans: e.target.value })}
                                         min="0"
                                         placeholder="Number of active loans"
                                     />
@@ -786,7 +786,7 @@ const BorrowerDashboard = () => {
                                         type="number"
                                         className="form-input"
                                         value={calculatorForm.latePayments}
-                                        onChange={(e) => setCalculatorForm({...calculatorForm, latePayments: e.target.value})}
+                                        onChange={(e) => setCalculatorForm({ ...calculatorForm, latePayments: e.target.value })}
                                         min="0"
                                         placeholder="Number of late payments"
                                     />
@@ -797,7 +797,7 @@ const BorrowerDashboard = () => {
                                         type="number"
                                         className="form-input"
                                         value={calculatorForm.yearsOfCreditHistory}
-                                        onChange={(e) => setCalculatorForm({...calculatorForm, yearsOfCreditHistory: e.target.value})}
+                                        onChange={(e) => setCalculatorForm({ ...calculatorForm, yearsOfCreditHistory: e.target.value })}
                                         min="0"
                                         placeholder="e.g., 5"
                                     />
@@ -808,7 +808,7 @@ const BorrowerDashboard = () => {
                                     <input
                                         type="checkbox"
                                         checked={calculatorForm.hasDefaulted}
-                                        onChange={(e) => setCalculatorForm({...calculatorForm, hasDefaulted: e.target.checked})}
+                                        onChange={(e) => setCalculatorForm({ ...calculatorForm, hasDefaulted: e.target.checked })}
                                         style={{ width: '18px', height: '18px' }}
                                     />
                                     <span>I have defaulted on a loan in the past</span>

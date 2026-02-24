@@ -38,19 +38,38 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Create demo users
+        // ==== DEMO USERS ====
+        // Admin
         createUserIfNotExists("admin@12club.com", "admin123", "System", "Administrator",
                 "+1234567890", Role.ADMIN, null, null, null);
-        User lender = createUserIfNotExists("lender@12club.com", "lender123", "John", "Lender",
+
+        // Lenders (3)
+        User lender1 = createUserIfNotExists("lender@12club.com", "lender123", "John", "Lender",
                 "+1234567891", Role.LENDER, new BigDecimal("250000"), "BUSINESS_OWNER", null);
-        User borrower = createUserIfNotExists("borrower@12club.com", "borrower123", "Jane", "Borrower",
+        User lender2 = createUserIfNotExists("lender2@12club.com", "lender123", "Sarah", "Capital",
+                "+1234567894", Role.LENDER, new BigDecimal("320000"), "BUSINESS_OWNER", null);
+        User lender3 = createUserIfNotExists("lender3@12club.com", "lender123", "Michael", "Funds",
+                "+1234567895", Role.LENDER, new BigDecimal("180000"), "SELF_EMPLOYED", null);
+
+        // Borrowers (4)
+        User borrower1 = createUserIfNotExists("borrower@12club.com", "borrower123", "Jane", "Borrower",
                 "+1234567892", Role.BORROWER, new BigDecimal("65000"), "EMPLOYED", 720);
+        User borrower2 = createUserIfNotExists("borrower2@12club.com", "borrower123", "David", "Wilson",
+                "+1234567896", Role.BORROWER, new BigDecimal("85000"), "EMPLOYED", 680);
+        User borrower3 = createUserIfNotExists("borrower3@12club.com", "borrower123", "Priya", "Sharma",
+                "+1234567897", Role.BORROWER, new BigDecimal("52000"), "SELF_EMPLOYED", 750);
+        User borrower4 = createUserIfNotExists("borrower4@12club.com", "borrower123", "Carlos", "Rivera",
+                "+1234567898", Role.BORROWER, new BigDecimal("48000"), "EMPLOYED", 640);
+
+        // Analysts (2)
         createUserIfNotExists("analyst@12club.com", "analyst123", "Alex", "Analyst",
                 "+1234567893", Role.ANALYST, null, null, null);
+        createUserIfNotExists("analyst2@12club.com", "analyst123", "Neha", "Insights",
+                "+1234567899", Role.ANALYST, null, null, null);
 
-        // Only seed demo data if no loans exist yet (avoid duplicating on restart)
-        if (loanRepository.count() == 0 && lender != null && borrower != null) {
-            seedDemoData(lender, borrower);
+        // Seed demo data
+        if (loanRepository.count() == 0 && lender1 != null && borrower1 != null) {
+            seedDemoData(lender1, lender2, lender3, borrower1, borrower2, borrower3, borrower4);
         }
 
         log.info("Data initialization complete. Total users: {}", userRepository.count());
@@ -81,15 +100,15 @@ public class DataInitializer implements CommandLineRunner {
         return user;
     }
 
-    private void seedDemoData(User lender, User borrower) {
-        log.info("Seeding demo data for demonstration...");
+    private void seedDemoData(User lender1, User lender2, User lender3,
+            User borrower1, User borrower2, User borrower3, User borrower4) {
+        log.info("Seeding rich demo data for demonstration...");
 
         // ============================================================
-        // LOAN 1: Active Home Renovation Loan ($25,000 @ 10% for 12 months)
+        // LOAN 1: Active Home Renovation ($25,000 @ 10% for 12mo) - lender1 → borrower1
         // ============================================================
         Loan loan1 = Loan.builder()
-                .lender(lender)
-                .borrower(borrower)
+                .lender(lender1).borrower(borrower1)
                 .principalAmount(new BigDecimal("25000.00"))
                 .interestRate(new BigDecimal("10.00"))
                 .termMonths(12)
@@ -102,54 +121,14 @@ public class DataInitializer implements CommandLineRunner {
         loan1.setTotalInterest(loan1.calculateTotalInterest());
         loan1.setRemainingBalance(new BigDecimal("17500.00"));
         loan1 = loanRepository.save(loan1);
-
-        // Payments for Loan 1: 4 paid, 1 overdue, rest pending
-        BigDecimal emi1 = loan1.getMonthlyPayment();
-        for (int i = 1; i <= 12; i++) {
-            LocalDate dueDate = loan1.getStartDate().plusMonths(i);
-            Payment payment = Payment.builder()
-                    .loan(loan1)
-                    .paymentNumber(i)
-                    .amountDue(emi1)
-                    .principalPortion(emi1.multiply(new BigDecimal("0.80")).setScale(2, RoundingMode.HALF_UP))
-                    .interestPortion(emi1.multiply(new BigDecimal("0.20")).setScale(2, RoundingMode.HALF_UP))
-                    .dueDate(dueDate)
-                    .lateFee(BigDecimal.ZERO)
-                    .build();
-
-            if (i <= 3) {
-                // First 3 paid on time
-                payment.setStatus(PaymentStatus.COMPLETED);
-                payment.setAmountPaid(emi1);
-                payment.setPaidDate(dueDate.minusDays(2));
-                payment.setPaymentMethod("BANK_TRANSFER");
-                payment.setTransactionReference("TXN-DEMO-L1-" + i);
-            } else if (i == 4) {
-                // 4th paid late
-                payment.setStatus(PaymentStatus.LATE);
-                payment.setAmountPaid(emi1.add(new BigDecimal("50.00")));
-                payment.setLateFee(new BigDecimal("50.00"));
-                payment.setPaidDate(dueDate.plusDays(10));
-                payment.setPaymentMethod("UPI");
-                payment.setTransactionReference("TXN-DEMO-L1-4-LATE");
-            } else if (i == 5 && dueDate.isBefore(LocalDate.now())) {
-                // 5th overdue
-                payment.setStatus(PaymentStatus.OVERDUE);
-                payment.setLateFee(new BigDecimal("75.00"));
-            } else {
-                // Future payments pending
-                payment.setStatus(PaymentStatus.PENDING);
-            }
-            paymentRepository.save(payment);
-        }
-        log.info("Created Loan #1: Active Home Renovation ($25,000)");
+        createPaymentsForActiveLoan(loan1, 4);
+        log.info("Loan #1: Active Home Renovation ($25,000)");
 
         // ============================================================
-        // LOAN 2: Completed Education Loan ($10,000 @ 8% for 6 months)
+        // LOAN 2: Completed Education Loan ($10,000 @ 8% for 6mo) - lender1 → borrower1
         // ============================================================
         Loan loan2 = Loan.builder()
-                .lender(lender)
-                .borrower(borrower)
+                .lender(lender1).borrower(borrower1)
                 .principalAmount(new BigDecimal("10000.00"))
                 .interestRate(new BigDecimal("8.00"))
                 .termMonths(6)
@@ -162,66 +141,74 @@ public class DataInitializer implements CommandLineRunner {
         loan2.setTotalInterest(loan2.calculateTotalInterest());
         loan2.setRemainingBalance(BigDecimal.ZERO);
         loan2 = loanRepository.save(loan2);
-
-        // All 6 payments completed
-        BigDecimal emi2 = loan2.getMonthlyPayment();
-        for (int i = 1; i <= 6; i++) {
-            Payment payment = Payment.builder()
-                    .loan(loan2)
-                    .paymentNumber(i)
-                    .amountDue(emi2)
-                    .principalPortion(emi2.multiply(new BigDecimal("0.82")).setScale(2, RoundingMode.HALF_UP))
-                    .interestPortion(emi2.multiply(new BigDecimal("0.18")).setScale(2, RoundingMode.HALF_UP))
-                    .dueDate(loan2.getStartDate().plusMonths(i))
-                    .status(PaymentStatus.COMPLETED)
-                    .amountPaid(emi2)
-                    .lateFee(BigDecimal.ZERO)
-                    .build();
-            payment.setPaidDate(loan2.getStartDate().plusMonths(i).minusDays(1));
-            payment.setPaymentMethod("BANK_TRANSFER");
-            payment.setTransactionReference("TXN-DEMO-L2-" + i);
-            paymentRepository.save(payment);
-        }
-        log.info("Created Loan #2: Completed Education ($10,000)");
+        createCompletedPayments(loan2);
+        log.info("Loan #2: Completed Education ($10,000)");
 
         // ============================================================
-        // LOAN 3: Pending loan offer ($50,000 @ 12% for 24 months) - no borrower yet
+        // LOAN 3: Active Business Loan ($50,000 @ 12% for 24mo) - lender2 → borrower2
         // ============================================================
         Loan loan3 = Loan.builder()
-                .lender(lender)
+                .lender(lender2).borrower(borrower2)
                 .principalAmount(new BigDecimal("50000.00"))
                 .interestRate(new BigDecimal("12.00"))
                 .termMonths(24)
-                .status(LoanStatus.PENDING)
-                .description("Business expansion loan - open to applications")
+                .status(LoanStatus.ACTIVE)
+                .description("Business expansion loan - second retail location")
+                .startDate(LocalDate.now().minusMonths(6))
+                .endDate(LocalDate.now().plusMonths(18))
                 .build();
         loan3.setMonthlyPayment(loan3.calculateMonthlyPayment());
         loan3.setTotalInterest(loan3.calculateTotalInterest());
+        loan3.setRemainingBalance(new BigDecimal("39000.00"));
         loan3 = loanRepository.save(loan3);
-        log.info("Created Loan #3: Pending Business Offer ($50,000)");
+        createPaymentsForActiveLoan(loan3, 6);
+        log.info("Loan #3: Active Business ($50,000)");
 
         // ============================================================
-        // LOAN 4: Another pending offer ($15,000 @ 9% for 12 months)
+        // LOAN 4: Completed Car Loan ($18,000 @ 7.5% for 12mo) - lender2 → borrower3
         // ============================================================
         Loan loan4 = Loan.builder()
-                .lender(lender)
-                .principalAmount(new BigDecimal("15000.00"))
-                .interestRate(new BigDecimal("9.00"))
+                .lender(lender2).borrower(borrower3)
+                .principalAmount(new BigDecimal("18000.00"))
+                .interestRate(new BigDecimal("7.50"))
                 .termMonths(12)
-                .status(LoanStatus.PENDING)
-                .description("Personal loan for medical expenses")
+                .status(LoanStatus.COMPLETED)
+                .description("Used car purchase loan")
+                .startDate(LocalDate.now().minusMonths(14))
+                .endDate(LocalDate.now().minusMonths(2))
                 .build();
         loan4.setMonthlyPayment(loan4.calculateMonthlyPayment());
         loan4.setTotalInterest(loan4.calculateTotalInterest());
+        loan4.setRemainingBalance(BigDecimal.ZERO);
         loan4 = loanRepository.save(loan4);
-        log.info("Created Loan #4: Pending Personal Offer ($15,000)");
+        createCompletedPayments(loan4);
+        log.info("Loan #4: Completed Car ($18,000)");
 
         // ============================================================
-        // LOAN 5: Defaulted loan ($8,000 @ 15% for 6 months)
+        // LOAN 5: Active Medical Loan ($15,000 @ 9% for 12mo) - lender3 → borrower3
         // ============================================================
         Loan loan5 = Loan.builder()
-                .lender(lender)
-                .borrower(borrower)
+                .lender(lender3).borrower(borrower3)
+                .principalAmount(new BigDecimal("15000.00"))
+                .interestRate(new BigDecimal("9.00"))
+                .termMonths(12)
+                .status(LoanStatus.ACTIVE)
+                .description("Medical emergency loan for family surgery")
+                .startDate(LocalDate.now().minusMonths(3))
+                .endDate(LocalDate.now().plusMonths(9))
+                .build();
+        loan5.setMonthlyPayment(loan5.calculateMonthlyPayment());
+        loan5.setTotalInterest(loan5.calculateTotalInterest());
+        loan5.setRemainingBalance(new BigDecimal("11500.00"));
+        loan5 = loanRepository.save(loan5);
+        createPaymentsForActiveLoan(loan5, 3);
+        log.info("Loan #5: Active Medical ($15,000)");
+
+        // ============================================================
+        // LOAN 6: Defaulted Emergency Loan ($8,000 @ 15% for 6mo) - lender1 → borrower4
+        // ============================================================
+        Loan loan6 = Loan.builder()
+                .lender(lender1).borrower(borrower4)
                 .principalAmount(new BigDecimal("8000.00"))
                 .interestRate(new BigDecimal("15.00"))
                 .termMonths(6)
@@ -230,87 +217,242 @@ public class DataInitializer implements CommandLineRunner {
                 .startDate(LocalDate.now().minusMonths(8))
                 .endDate(LocalDate.now().minusMonths(2))
                 .build();
-        loan5.setMonthlyPayment(loan5.calculateMonthlyPayment());
-        loan5.setTotalInterest(loan5.calculateTotalInterest());
-        loan5.setRemainingBalance(new BigDecimal("5500.00"));
-        loan5.setTotalPenaltyAccrued(new BigDecimal("350.00"));
-        loan5 = loanRepository.save(loan5);
+        loan6.setMonthlyPayment(loan6.calculateMonthlyPayment());
+        loan6.setTotalInterest(loan6.calculateTotalInterest());
+        loan6.setRemainingBalance(new BigDecimal("5500.00"));
+        loan6.setTotalPenaltyAccrued(new BigDecimal("350.00"));
+        loan6 = loanRepository.save(loan6);
+        createDefaultedPayments(loan6);
+        log.info("Loan #6: Defaulted Emergency ($8,000)");
 
-        // 2 paid, 4 missed
-        BigDecimal emi5 = loan5.getMonthlyPayment();
-        for (int i = 1; i <= 6; i++) {
+        // ============================================================
+        // LOAN 7: Completed Personal Loan ($12,000 @ 11% for 6mo) - lender3 → borrower2
+        // ============================================================
+        Loan loan7 = Loan.builder()
+                .lender(lender3).borrower(borrower2)
+                .principalAmount(new BigDecimal("12000.00"))
+                .interestRate(new BigDecimal("11.00"))
+                .termMonths(6)
+                .status(LoanStatus.COMPLETED)
+                .description("Personal loan for home appliances and furniture")
+                .startDate(LocalDate.now().minusMonths(9))
+                .endDate(LocalDate.now().minusMonths(3))
+                .build();
+        loan7.setMonthlyPayment(loan7.calculateMonthlyPayment());
+        loan7.setTotalInterest(loan7.calculateTotalInterest());
+        loan7.setRemainingBalance(BigDecimal.ZERO);
+        loan7 = loanRepository.save(loan7);
+        createCompletedPayments(loan7);
+        log.info("Loan #7: Completed Personal ($12,000)");
+
+        // ============================================================
+        // LOAN 8: Active Wedding Loan ($35,000 @ 10.5% for 18mo) - lender2 → borrower4
+        // ============================================================
+        Loan loan8 = Loan.builder()
+                .lender(lender2).borrower(borrower4)
+                .principalAmount(new BigDecimal("35000.00"))
+                .interestRate(new BigDecimal("10.50"))
+                .termMonths(18)
+                .status(LoanStatus.ACTIVE)
+                .description("Wedding and reception expenses loan")
+                .startDate(LocalDate.now().minusMonths(2))
+                .endDate(LocalDate.now().plusMonths(16))
+                .build();
+        loan8.setMonthlyPayment(loan8.calculateMonthlyPayment());
+        loan8.setTotalInterest(loan8.calculateTotalInterest());
+        loan8.setRemainingBalance(new BigDecimal("31500.00"));
+        loan8 = loanRepository.save(loan8);
+        createPaymentsForActiveLoan(loan8, 2);
+        log.info("Loan #8: Active Wedding ($35,000)");
+
+        // ============================================================
+        // LOAN 9: Pending Offer ($40,000 @ 11% for 24mo) - lender1, no borrower
+        // ============================================================
+        Loan loan9 = Loan.builder()
+                .lender(lender1)
+                .principalAmount(new BigDecimal("40000.00"))
+                .interestRate(new BigDecimal("11.00"))
+                .termMonths(24)
+                .status(LoanStatus.PENDING)
+                .description("Investment opportunity - open for applications")
+                .build();
+        loan9.setMonthlyPayment(loan9.calculateMonthlyPayment());
+        loan9.setTotalInterest(loan9.calculateTotalInterest());
+        loan9 = loanRepository.save(loan9);
+        log.info("Loan #9: Pending Offer ($40,000)");
+
+        // ============================================================
+        // LOAN 10: Pending Offer ($20,000 @ 8.5% for 12mo) - lender3, no borrower
+        // ============================================================
+        Loan loan10 = Loan.builder()
+                .lender(lender3)
+                .principalAmount(new BigDecimal("20000.00"))
+                .interestRate(new BigDecimal("8.50"))
+                .termMonths(12)
+                .status(LoanStatus.PENDING)
+                .description("Education & skill development loan offer")
+                .build();
+        loan10.setMonthlyPayment(loan10.calculateMonthlyPayment());
+        loan10.setTotalInterest(loan10.calculateTotalInterest());
+        loan10 = loanRepository.save(loan10);
+        log.info("Loan #10: Pending Offer ($20,000)");
+
+        // ============================================================
+        // LOAN APPLICATIONS (5 total: 2 approved, 2 pending, 1 rejected)
+        // ============================================================
+
+        // Approved for loan1
+        LoanApplication app1 = LoanApplication.builder()
+                .borrower(borrower1).loan(loan1)
+                .requestedAmount(new BigDecimal("25000.00"))
+                .requestedTermMonths(12)
+                .purpose("Home renovation - kitchen and bathroom remodel")
+                .annualIncome(new BigDecimal("65000.00"))
+                .employmentStatus("EMPLOYED").creditScore(720)
+                .status(ApplicationStatus.APPROVED)
+                .build();
+        loanApplicationRepository.save(app1);
+
+        // Approved for loan3
+        LoanApplication app2 = LoanApplication.builder()
+                .borrower(borrower2).loan(loan3)
+                .requestedAmount(new BigDecimal("50000.00"))
+                .requestedTermMonths(24)
+                .purpose("Business expansion - opening second retail location")
+                .annualIncome(new BigDecimal("85000.00"))
+                .employmentStatus("EMPLOYED").creditScore(680)
+                .status(ApplicationStatus.APPROVED)
+                .build();
+        loanApplicationRepository.save(app2);
+
+        // Pending for loan9
+        LoanApplication app3 = LoanApplication.builder()
+                .borrower(borrower3).loan(loan9)
+                .requestedAmount(new BigDecimal("40000.00"))
+                .requestedTermMonths(24)
+                .purpose("Starting an e-commerce business")
+                .annualIncome(new BigDecimal("52000.00"))
+                .employmentStatus("SELF_EMPLOYED").creditScore(750)
+                .status(ApplicationStatus.PENDING)
+                .build();
+        loanApplicationRepository.save(app3);
+
+        // Pending for loan10
+        LoanApplication app4 = LoanApplication.builder()
+                .borrower(borrower4).loan(loan10)
+                .requestedAmount(new BigDecimal("20000.00"))
+                .requestedTermMonths(12)
+                .purpose("Professional certification and training")
+                .annualIncome(new BigDecimal("48000.00"))
+                .employmentStatus("EMPLOYED").creditScore(640)
+                .status(ApplicationStatus.PENDING)
+                .build();
+        loanApplicationRepository.save(app4);
+
+        // Rejected
+        LoanApplication app5 = LoanApplication.builder()
+                .borrower(borrower4).loan(loan9)
+                .requestedAmount(new BigDecimal("40000.00"))
+                .requestedTermMonths(24)
+                .purpose("Speculative stock trading capital")
+                .annualIncome(new BigDecimal("48000.00"))
+                .employmentStatus("EMPLOYED").creditScore(640)
+                .status(ApplicationStatus.REJECTED)
+                .build();
+        app5.setRejectionReason("High-risk purpose and insufficient income for requested amount");
+        loanApplicationRepository.save(app5);
+
+        log.info("Created 5 loan applications (2 approved, 2 pending, 1 rejected)");
+        log.info("Demo data seeding complete! Loans: {}, Payments: {}, Applications: {}",
+                loanRepository.count(), paymentRepository.count(), loanApplicationRepository.count());
+    }
+
+    // ==== HELPER METHODS ====
+
+    private void createPaymentsForActiveLoan(Loan loan, int paidCount) {
+        BigDecimal emi = loan.getMonthlyPayment();
+        int term = loan.getTermMonths();
+        for (int i = 1; i <= term; i++) {
+            LocalDate dueDate = loan.getStartDate().plusMonths(i);
             Payment payment = Payment.builder()
-                    .loan(loan5)
+                    .loan(loan)
                     .paymentNumber(i)
-                    .amountDue(emi5)
-                    .principalPortion(emi5.multiply(new BigDecimal("0.75")).setScale(2, RoundingMode.HALF_UP))
-                    .interestPortion(emi5.multiply(new BigDecimal("0.25")).setScale(2, RoundingMode.HALF_UP))
-                    .dueDate(loan5.getStartDate().plusMonths(i))
+                    .amountDue(emi)
+                    .principalPortion(emi.multiply(new BigDecimal("0.80")).setScale(2, RoundingMode.HALF_UP))
+                    .interestPortion(emi.multiply(new BigDecimal("0.20")).setScale(2, RoundingMode.HALF_UP))
+                    .dueDate(dueDate)
+                    .lateFee(BigDecimal.ZERO)
+                    .build();
+
+            if (i <= paidCount - 1) {
+                // On-time payments
+                payment.setStatus(PaymentStatus.COMPLETED);
+                payment.setAmountPaid(emi);
+                payment.setPaidDate(dueDate.minusDays(2));
+                payment.setPaymentMethod("BANK_TRANSFER");
+                payment.setTransactionReference("TXN-DEMO-" + loan.getId() + "-" + i);
+            } else if (i == paidCount) {
+                // Last paid - late payment
+                payment.setStatus(PaymentStatus.LATE);
+                payment.setAmountPaid(emi.add(new BigDecimal("50.00")));
+                payment.setLateFee(new BigDecimal("50.00"));
+                payment.setPaidDate(dueDate.plusDays(8));
+                payment.setPaymentMethod("UPI");
+                payment.setTransactionReference("TXN-DEMO-" + loan.getId() + "-" + i + "-LATE");
+            } else {
+                // Future pending
+                payment.setStatus(PaymentStatus.PENDING);
+            }
+            paymentRepository.save(payment);
+        }
+    }
+
+    private void createCompletedPayments(Loan loan) {
+        BigDecimal emi = loan.getMonthlyPayment();
+        int term = loan.getTermMonths();
+        for (int i = 1; i <= term; i++) {
+            Payment payment = Payment.builder()
+                    .loan(loan)
+                    .paymentNumber(i)
+                    .amountDue(emi)
+                    .principalPortion(emi.multiply(new BigDecimal("0.82")).setScale(2, RoundingMode.HALF_UP))
+                    .interestPortion(emi.multiply(new BigDecimal("0.18")).setScale(2, RoundingMode.HALF_UP))
+                    .dueDate(loan.getStartDate().plusMonths(i))
+                    .status(PaymentStatus.COMPLETED)
+                    .amountPaid(emi)
+                    .lateFee(BigDecimal.ZERO)
+                    .build();
+            payment.setPaidDate(loan.getStartDate().plusMonths(i).minusDays(1));
+            payment.setPaymentMethod("BANK_TRANSFER");
+            payment.setTransactionReference("TXN-DEMO-" + loan.getId() + "-" + i);
+            paymentRepository.save(payment);
+        }
+    }
+
+    private void createDefaultedPayments(Loan loan) {
+        BigDecimal emi = loan.getMonthlyPayment();
+        int term = loan.getTermMonths();
+        for (int i = 1; i <= term; i++) {
+            Payment payment = Payment.builder()
+                    .loan(loan)
+                    .paymentNumber(i)
+                    .amountDue(emi)
+                    .principalPortion(emi.multiply(new BigDecimal("0.75")).setScale(2, RoundingMode.HALF_UP))
+                    .interestPortion(emi.multiply(new BigDecimal("0.25")).setScale(2, RoundingMode.HALF_UP))
+                    .dueDate(loan.getStartDate().plusMonths(i))
                     .lateFee(BigDecimal.ZERO)
                     .build();
             if (i <= 2) {
                 payment.setStatus(PaymentStatus.COMPLETED);
-                payment.setAmountPaid(emi5);
-                payment.setPaidDate(loan5.getStartDate().plusMonths(i));
+                payment.setAmountPaid(emi);
+                payment.setPaidDate(loan.getStartDate().plusMonths(i));
                 payment.setPaymentMethod("CARD");
-                payment.setTransactionReference("TXN-DEMO-L5-" + i);
+                payment.setTransactionReference("TXN-DEMO-" + loan.getId() + "-" + i);
             } else {
                 payment.setStatus(PaymentStatus.MISSED);
                 payment.setLateFee(new BigDecimal("85.00"));
             }
             paymentRepository.save(payment);
         }
-        log.info("Created Loan #5: Defaulted Emergency ($8,000)");
-
-        // ============================================================
-        // LOAN APPLICATIONS
-        // ============================================================
-
-        // Application 1: Approved (for loan1)
-        LoanApplication app1 = LoanApplication.builder()
-                .borrower(borrower)
-                .loan(loan1)
-                .requestedAmount(new BigDecimal("25000.00"))
-                .requestedTermMonths(12)
-                .purpose("Home renovation - kitchen and bathroom remodel")
-                .annualIncome(new BigDecimal("65000.00"))
-                .employmentStatus("EMPLOYED")
-                .creditScore(720)
-                .status(ApplicationStatus.APPROVED)
-                .build();
-        loanApplicationRepository.save(app1);
-
-        // Application 2: Pending (for loan3 - business expansion)
-        LoanApplication app2 = LoanApplication.builder()
-                .borrower(borrower)
-                .loan(loan3)
-                .requestedAmount(new BigDecimal("50000.00"))
-                .requestedTermMonths(24)
-                .purpose("Business expansion - opening second retail location")
-                .annualIncome(new BigDecimal("65000.00"))
-                .employmentStatus("EMPLOYED")
-                .creditScore(720)
-                .status(ApplicationStatus.PENDING)
-                .build();
-        loanApplicationRepository.save(app2);
-
-        // Application 3: Rejected
-        LoanApplication app3 = LoanApplication.builder()
-                .borrower(borrower)
-                .loan(loan4)
-                .requestedAmount(new BigDecimal("15000.00"))
-                .requestedTermMonths(12)
-                .purpose("Medical expenses for family member surgery")
-                .annualIncome(new BigDecimal("65000.00"))
-                .employmentStatus("EMPLOYED")
-                .creditScore(720)
-                .status(ApplicationStatus.REJECTED)
-                .build();
-        app3.setRejectionReason("Debt-to-income ratio too high with existing active loans");
-        loanApplicationRepository.save(app3);
-
-        log.info("Created 3 loan applications (1 approved, 1 pending, 1 rejected)");
-        log.info("Demo data seeding complete! Loans: {}, Payments: {}, Applications: {}",
-                loanRepository.count(), paymentRepository.count(), loanApplicationRepository.count());
     }
 }

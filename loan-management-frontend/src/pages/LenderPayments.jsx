@@ -27,7 +27,7 @@ const LenderPayments = () => {
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'USD',
+            currency: 'INR',
         }).format(amount || 0);
     };
 
@@ -38,7 +38,7 @@ const LenderPayments = () => {
 
     const handleApprove = async (paymentId) => {
         if (!confirm('Are you sure you want to approve this payment?')) return;
-        
+
         try {
             setActionLoading(paymentId);
             await lenderAPI.approvePayment(paymentId);
@@ -55,7 +55,7 @@ const LenderPayments = () => {
     const handleReject = async (paymentId) => {
         const reason = prompt('Enter reason for rejection (optional):');
         if (reason === null) return; // User cancelled
-        
+
         try {
             setActionLoading(paymentId);
             await lenderAPI.rejectPayment(paymentId, reason);
@@ -98,7 +98,7 @@ const LenderPayments = () => {
                     <div className="alert alert-info" style={{ marginBottom: '20px' }}>
                         <strong>📋 {payments.length} payment(s)</strong> awaiting your approval
                     </div>
-                    
+
                     <div className="table-container">
                         <table className="table">
                             <thead>

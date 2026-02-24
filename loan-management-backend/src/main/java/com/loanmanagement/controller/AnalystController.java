@@ -81,4 +81,11 @@ public class AnalystController {
         List<PaymentResponse> payments = paymentService.getOverduePayments();
         return ResponseEntity.ok(ApiResponse.success(payments));
     }
+
+    @GetMapping("/reports/trends")
+    @Operation(summary = "Get monthly trend data for charts")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getMonthlyTrends() {
+        List<Map<String, Object>> trends = reportService.getMonthlyTrends();
+        return ResponseEntity.ok(ApiResponse.success(trends));
+    }
 }

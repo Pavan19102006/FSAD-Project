@@ -29,7 +29,7 @@ const AnalystPayments = () => {
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'USD',
+            currency: 'INR',
         }).format(amount || 0);
     };
 
@@ -112,19 +112,19 @@ const AnalystPayments = () => {
                 <div style={{ padding: '8px 0' }}>
                     <div style={{ marginBottom: '20px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ color: '#9ca3af', fontSize: '14px' }}>🟢 Completed</span>
-                            <span style={{ color: 'white', fontWeight: '600' }}>{completedPayments} of {totalPayments}</span>
+                            <span style={{ color: '#6b7280', fontSize: '14px' }}>🟢 Completed</span>
+                            <span style={{ color: '#1d1d1f', fontWeight: '600' }}>{completedPayments} of {totalPayments}</span>
                         </div>
-                        <div style={{ height: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden' }}>
+                        <div style={{ height: '12px', background: 'var(--bg-tertiary)', borderRadius: '6px', overflow: 'hidden' }}>
                             <div style={{ height: '100%', width: `${completionRate}%`, background: 'linear-gradient(90deg, #10b981, #34d399)', borderRadius: '6px', transition: 'width 1s ease' }}></div>
                         </div>
                     </div>
                     <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span style={{ color: '#9ca3af', fontSize: '14px' }}>🔴 Overdue</span>
-                            <span style={{ color: 'white', fontWeight: '600' }}>{overduePayments.length}</span>
+                            <span style={{ color: '#6b7280', fontSize: '14px' }}>🔴 Overdue</span>
+                            <span style={{ color: '#1d1d1f', fontWeight: '600' }}>{overduePayments.length}</span>
                         </div>
-                        <div style={{ height: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden' }}>
+                        <div style={{ height: '12px', background: 'var(--bg-tertiary)', borderRadius: '6px', overflow: 'hidden' }}>
                             <div style={{ height: '100%', width: `${totalPayments ? Math.max((overduePayments.length / totalPayments) * 100, 2) : 2}%`, background: 'linear-gradient(90deg, #ef4444, #f87171)', borderRadius: '6px', transition: 'width 1s ease' }}></div>
                         </div>
                     </div>

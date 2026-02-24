@@ -58,7 +58,7 @@ const LenderDashboard = () => {
             alert('Please enter a valid amount');
             return;
         }
-        
+
         const availableBalance = (dashboard?.amountReclaimed || 0) + (dashboard?.totalInterestEarned || 0);
         if (parseFloat(withdrawAmount) > availableBalance) {
             alert('Insufficient balance for withdrawal');
@@ -113,7 +113,7 @@ const LenderDashboard = () => {
                     onClose={closeTutorial}
                 />
             )}
-            
+
             {/* Withdraw Modal */}
             {showWithdrawModal && (
                 <div className="modal-overlay" onClick={() => setShowWithdrawModal(false)}>
@@ -142,15 +142,15 @@ const LenderDashboard = () => {
                                 />
                             </div>
                             <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-                                <button 
-                                    className="btn btn-secondary" 
+                                <button
+                                    className="btn btn-secondary"
                                     style={{ flex: 1 }}
                                     onClick={() => setShowWithdrawModal(false)}
                                 >
                                     Cancel
                                 </button>
-                                <button 
-                                    className="btn btn-primary" 
+                                <button
+                                    className="btn btn-primary"
                                     style={{ flex: 1 }}
                                     onClick={handleWithdraw}
                                     disabled={withdrawLoading}
@@ -216,7 +216,7 @@ const LenderDashboard = () => {
                 </div>
 
                 {/* Available Balance & Withdraw */}
-                <div className="card" style={{ marginTop: '24px', background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)', border: '1px solid var(--accent-primary)' }}>
+                <div className="card" style={{ marginTop: '24px', background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', border: 'none' }}>
                     <div className="card-header">
                         <h3 className="card-title">💳 Available Balance</h3>
                     </div>
@@ -229,8 +229,8 @@ const LenderDashboard = () => {
                                 Reclaimed: {formatCurrency(dashboard?.amountReclaimed)} + Interest: {formatCurrency(dashboard?.totalInterestEarned)}
                             </p>
                         </div>
-                        <button 
-                            className="btn btn-primary" 
+                        <button
+                            className="btn btn-primary"
                             style={{ fontSize: '16px', padding: '12px 32px' }}
                             onClick={() => setShowWithdrawModal(true)}
                         >

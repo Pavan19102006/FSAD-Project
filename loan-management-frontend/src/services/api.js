@@ -41,6 +41,7 @@ export const authAPI = {
 // Admin APIs
 export const adminAPI = {
     getDashboard: () => api.get('/admin/dashboard'),
+    getTrends: () => api.get('/admin/trends'),
     getUsers: () => api.get('/admin/users'),
     getUsersByRole: (role) => api.get(`/admin/users/role/${role}`),
     getUserDetails: (id) => api.get(`/admin/users/${id}`),
@@ -98,6 +99,7 @@ export const analystAPI = {
     getLoanAnalytics: () => api.get('/analyst/reports/loans'),
     getRiskAssessment: () => api.get('/analyst/reports/risk'),
     getPaymentAnalytics: () => api.get('/analyst/reports/payments'),
+    getTrends: () => api.get('/analyst/reports/trends'),
     getAllLoans: () => api.get('/analyst/loans'),
     getLoan: (id) => api.get(`/analyst/loans/${id}`),
     getLoanPayments: (id) => api.get(`/analyst/loans/${id}/payments`),
