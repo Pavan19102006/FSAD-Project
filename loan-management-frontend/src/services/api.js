@@ -33,9 +33,20 @@ api.interceptors.response.use(
 
 // Auth APIs
 export const authAPI = {
+    // Password login (with CAPTCHA) - returns JWT directly
     login: (data) => api.post('/auth/login', data),
+    // Register - returns otpRequired
     register: (data) => api.post('/auth/register', data),
     refresh: (refreshToken) => api.post(`/auth/refresh?refreshToken=${refreshToken}`),
+    // CAPTCHA
+    getCaptcha: () => api.get('/auth/captcha'),
+    // OTP-based login
+    sendLoginOtp: (email) => api.post('/auth/send-login-otp', { email }),
+    // OTP verification (for both registration and OTP login)
+    verifyOtp: (data) => api.post('/auth/verify-otp', data),
+    resendOtp: (data) => api.post('/auth/resend-otp', data),
+    // Google OAuth
+    googleAuth: (idToken) => api.post('/auth/google', { idToken }),
 };
 
 // Admin APIs
@@ -49,7 +60,6 @@ export const adminAPI = {
     deleteUser: (id) => api.delete(`/admin/users/${id}`),
     toggleUserStatus: (id) => api.patch(`/admin/users/${id}/toggle-status`),
     getUserStats: () => api.get('/admin/users/stats'),
-    // Credit score management
     getCreditScore: (userId) => api.get(`/admin/users/${userId}/credit-score`),
     updateCreditScore: (userId, data) => api.put(`/admin/users/${userId}/credit-score`, data),
     calculateRisk: (userId) => api.post(`/risk/calculate/${userId}`),
@@ -70,7 +80,6 @@ export const lenderAPI = {
     approveApplication: (id) => api.post(`/lender/applications/${id}/approve`),
     rejectApplication: (id, reason) => api.post(`/lender/applications/${id}/reject?reason=${reason}`),
     withdrawFunds: (data) => api.post('/lender/withdraw', data),
-    // Payment approval APIs
     getPendingPayments: () => api.get('/lender/payments/pending'),
     approvePayment: (id) => api.post(`/lender/payments/${id}/approve`),
     rejectPayment: (id, reason) => api.post(`/lender/payments/${id}/reject?reason=${reason || ''}`),
@@ -88,7 +97,6 @@ export const borrowerAPI = {
     getPayments: () => api.get('/borrower/payments'),
     makePayment: (data) => api.post('/borrower/payments', data),
     markPaymentAsPaid: (id, transactionRef) => api.post(`/borrower/payments/${id}/mark-paid?transactionReference=${transactionRef || ''}`),
-    // Credit Score APIs
     getCreditScore: () => api.get('/borrower/credit-score'),
     updateCreditScore: (data) => api.put('/borrower/credit-score', data),
     calculateCreditScore: (data) => api.post('/borrower/credit-score/calculate', data),

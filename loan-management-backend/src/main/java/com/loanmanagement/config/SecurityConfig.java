@@ -55,6 +55,10 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/captcha/**").permitAll()
+                        .requestMatchers("/api/auth/verify-otp").permitAll()
+                        .requestMatchers("/api/auth/resend-otp").permitAll()
+                        .requestMatchers("/api/auth/google").permitAll()
                         .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()

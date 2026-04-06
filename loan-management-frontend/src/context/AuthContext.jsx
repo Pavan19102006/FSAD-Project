@@ -15,8 +15,50 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const login = async (email, password) => {
-        const response = await authAPI.login({ email, password });
+    /**
+     * Password login (with CAPTCHA) - returns JWT directly
+     */
+    const login = async (email, password, captchaId, captchaAnswer) => {
+        const response = await authAPI.login({ email, password, captchaId, captchaAnswer });
+        const { data } = response.data;
+
+        localStorage.setItem('token', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(data));
+        setUser(data);
+        return data;
+    };
+
+    /**
+     * Register - sends OTP, user must verify before getting access
+     */
+    const register = async (userData) => {
+        const response = await authAPI.register(userData);
+        const { data } = response.data;
+
+        // Registration requires OTP verification
+        return {
+            otpRequired: true,
+            email: data.email,
+            maskedEmail: data.maskedEmail,
+            isRegistration: true,
+        };
+    };
+
+    /**
+     * Request OTP for passwordless login
+     */
+    const sendLoginOtp = async (email) => {
+        const response = await authAPI.sendLoginOtp(email);
+        const { data } = response.data;
+        return data;
+    };
+
+    /**
+     * Verify OTP - completes registration or OTP-based login
+     */
+    const verifyOtp = async (email, otp) => {
+        const response = await authAPI.verifyOtp({ email, otp });
         const { data } = response.data;
 
         localStorage.setItem('token', data.accessToken);
@@ -27,8 +69,13 @@ export const AuthProvider = ({ children }) => {
         return data;
     };
 
-    const register = async (userData) => {
-        const response = await authAPI.register(userData);
+    const resendOtp = async (email) => {
+        const response = await authAPI.resendOtp({ email });
+        return response.data;
+    };
+
+    const googleLogin = async (idToken) => {
+        const response = await authAPI.googleAuth(idToken);
         const { data } = response.data;
 
         localStorage.setItem('token', data.accessToken);
@@ -51,6 +98,10 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         register,
+        sendLoginOtp,
+        verifyOtp,
+        resendOtp,
+        googleLogin,
         logout,
         isAuthenticated: !!user,
     };

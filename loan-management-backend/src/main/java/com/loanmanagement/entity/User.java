@@ -20,7 +20,7 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @Column(name = "first_name", nullable = false)
@@ -56,6 +56,12 @@ public class User implements UserDetails {
 
     @Column(name = "employment_status", length = 50)
     private String employmentStatus;
+
+    @Column(name = "google_id")
+    private String googleId;
+
+    @Column(name = "auth_provider", length = 20)
+    private String authProvider = "LOCAL";
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -198,6 +204,22 @@ public class User implements UserDetails {
 
     public void setEmploymentStatus(String employmentStatus) {
         this.employmentStatus = employmentStatus;
+    }
+
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+
+    public String getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(String authProvider) {
+        this.authProvider = authProvider;
     }
 
     public LocalDateTime getCreatedAt() {

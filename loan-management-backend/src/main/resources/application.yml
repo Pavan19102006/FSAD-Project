@@ -27,12 +27,39 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  
+  # Mail Configuration (Gmail SMTP)
+  # Set these environment variables or replace with your credentials:
+  #   MAIL_USERNAME=your-email@gmail.com
+  #   MAIL_PASSWORD=your-app-password
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: boppanapavan63@gmail.com
+    password: dhhy fvpi ylts mlvo
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enabled: true
+            required: true
+
+  # Allow bean override for conditional mail sender
+  main:
+    allow-bean-definition-overriding: true
 
 # JWT Configuration
 jwt:
   secret: mySecretKeyForJWTTokenGenerationThatIsLongEnoughToBeSecure2024LoanManagementSystem
   expiration: 86400000 # 24 hours in milliseconds
   refresh-expiration: 604800000 # 7 days in milliseconds
+
+# Google OAuth Configuration
+# Replace with your Google Cloud OAuth Client ID
+google:
+  oauth:
+    client-id: 294447689205-dokotsf5o8mg3ca38er9roladvhsq9jl.apps.googleusercontent.com
 
 # OpenAPI / Swagger Configuration
 springdoc:

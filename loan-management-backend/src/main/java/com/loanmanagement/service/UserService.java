@@ -176,6 +176,15 @@ public class UserService implements UserDetailsService {
         return userRepository.countByRole(role);
     }
 
+    /**
+     * Build auth response for a user (used after OTP verification or Google OAuth).
+     */
+    public AuthResponse buildAuthResponseForUser(User user) {
+        String token = jwtTokenProvider.generateToken(user.getEmail());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
+        return buildAuthResponse(user, token, refreshToken);
+    }
+
     private AuthResponse buildAuthResponse(User user, String token, String refreshToken) {
         return AuthResponse.builder()
                 .accessToken(token)
