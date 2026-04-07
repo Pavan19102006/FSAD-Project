@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.internet.MimeMessage;
@@ -18,8 +19,9 @@ public class EmailService {
     private JavaMailSender mailSender;
 
     /**
-     * Send OTP email. Falls back to console logging if SMTP is not configured.
+     * Send OTP email asynchronously. Falls back to console logging if SMTP is not configured.
      */
+    @Async
     public void sendOtpEmail(String toEmail, String otp) {
         // Always log to console for dev convenience
         logger.info("========================================");
