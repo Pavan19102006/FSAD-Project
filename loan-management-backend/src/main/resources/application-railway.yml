@@ -1,0 +1,70 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: loan-management-system
+
+  # PostgreSQL Database (Railway provides PostgreSQL)
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/loanmanagement}
+    username: ${PGUSER:postgres}
+    password: ${PGPASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  h2:
+    console:
+      enabled: false
+
+  # Mail Configuration - use env vars in production
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enabled: true
+            required: true
+
+  main:
+    allow-bean-definition-overriding: true
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationThatIsLongEnoughToBeSecure2024LoanManagementSystem}
+  expiration: 86400000
+  refresh-expiration: 604800000
+
+# Google OAuth Configuration
+google:
+  oauth:
+    client-id: ${GOOGLE_OAUTH_CLIENT_ID:294447689205-dokotsf5o8mg3ca38er9roladvhsq9jl.apps.googleusercontent.com}
+
+# OpenAPI / Swagger Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+# Logging - production level
+logging:
+  level:
+    com.loanmanagement: INFO
+    org.springframework.security: WARN
+    root: WARN
